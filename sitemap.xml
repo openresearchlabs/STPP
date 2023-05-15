@@ -79,6 +79,9 @@
     <loc>https://carpentries.github.io/workbench-template-rmd/instructor/sampling.html</loc>
   </url>
   <url>
+    <loc>https://carpentries.github.io/workbench-template-rmd/instructor/setup.html</loc>
+  </url>
+  <url>
     <loc>https://carpentries.github.io/workbench-template-rmd/instructor/stan.html</loc>
   </url>
   <url>
@@ -104,6 +107,9 @@
   </url>
   <url>
     <loc>https://carpentries.github.io/workbench-template-rmd/sampling.html</loc>
+  </url>
+  <url>
+    <loc>https://carpentries.github.io/workbench-template-rmd/setup.html</loc>
   </url>
   <url>
     <loc>https://carpentries.github.io/workbench-template-rmd/stan.html</loc>
