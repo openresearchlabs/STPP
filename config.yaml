@@ -59,6 +59,7 @@ contact: 'team@carpentries.org'
 
 # Order of episodes in your lesson
 episodes:
+- setup.Rmd
 - bayesian-statistics.Rmd
 - sampling.Rmd
 - stan.Rmd
@@ -66,6 +67,7 @@ episodes:
 - hierarchical-models.Rmd
 - model-checking.Rmd
 - advanced-topics.Rmd
+
 
 # Information for Learners
 learners:
