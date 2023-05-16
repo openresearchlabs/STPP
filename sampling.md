@@ -42,6 +42,9 @@ N <- 50
 # 7/50 are left-handed
 x <- 7
 
+# Frequency in a large population sample
+p_true <- 9.6/100
+
 # Number of samples
 n_samples <- 5000
 
@@ -96,7 +99,9 @@ p <- p +
   geom_line(data = analytical_df %>% 
               filter(func == "likelihood"), 
             aes(x = p, y = value), 
-            linewidth = 1)
+            linewidth = 1) +
+  geom_vline(xintercept = p_true,
+             color = "green", linewidth = 1)
 
 print(p)
 ```
@@ -112,23 +117,61 @@ generated.
 <img src="fig/sampling-rendered-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 
+In Episode 1, we summarized the posterior with points estimates, namely the posterior mode (MAP), mean and variance. 
+
+The standard way of reporting posterior information is based on *credible intervals* (CI), which refer to areas of the parameter space where a certain amount of posterior mass is located. Usually CIs are computed as quantiles of posterior, so for instance the 95\% CI would be located between the 2.5\% and 97.5\% percentiles. Another approach is to compute the smallest such set that contains 95\% of the posterior, which are also called highest posterior density intervals (HPDI). 
+
+Let us now compute the percentile-based CIs for the handedness example, along with the posterior mode (MAP), and include them in the figure. 
+
+(Figure too busy --> clarify)
 
 
 ```r
+# MAP
+posterior_density <- density(posterior_samples)
+MAP <- posterior_density$x[which.max(posterior_density$y)]
+
+# 95% credible interval
+CIs <- quantile(posterior_samples, probs = c(0.025, 0.975))
+
+p <- p +
   geom_vline(xintercept = CIs, linetype = "dashed") + 
   geom_vline(xintercept = MAP) +
   geom_vline(xintercept = p_true, color = "blue", size = 1) +
   labs(title = "Black = MAP and CIs")
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'CIs' not found
+```{.warning}
+Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.
+```
+
+```r
+print(p)
+```
+
+<img src="fig/sampling-rendered-unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+
+
+Another perspective into processing posterior information is to find the amount the posterior mass in a given interval (or some more general set). This approach enables determining probabilities for hypotheses. For instance, we might be interested in knowing the probability that the target parameter is less than 0.2, between 0.05 and 0.10, or less than 0.05 or greater than 0.10. Such probabilities can be recovered based on samples simply by computing the proportion of samples in these sets. 
+
+
+```r
+p_less_than_0.2 <- mean(posterior_samples < 0.2)
+p_between_0.05_0.1 <- mean(posterior_samples > 0.05 & posterior_samples < 0.1)
+p_outside_0.05_0.1 <- mean(posterior_samples < 0.05 | posterior_samples > 0.10)
 ```
 
 
 
 
+
 ::::::::::::::::::::::::::::::::::::: Discussion
+
+How would you compute CIs based on an analytical posterior density?
 
 Can you draw samples from the likelihood?
 
