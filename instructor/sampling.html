@@ -172,7 +172,7 @@
         
     <div id="flush-collapsecurrent" class="accordion-collapse collapse show" aria-labelledby="flush-headingcurrent" data-bs-parent="#accordionFlushcurrent">
       <div class="accordion-body">
-        <ul><li><a href="#body">Body</a></li>
+        <ul><li><a href="#example-binomial-model">Example: binomial model</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
         
@@ -305,8 +305,7 @@
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>
-<h2 id="learn-how-to">Learn how to</h2>
+<ul><li>Learn how to
 <ul><li>work with posterior samples</li>
 <li>compute posterior intervals</li>
 </ul></li>
@@ -315,9 +314,117 @@
 </div>
 </div>
 </div>
-<section id="body"><h2 class="section-heading">Body<a class="anchor" aria-label="anchor" href="#body"></a>
+<p>In the last episode, we were introduced to the Bayesian formula and
+fit the binomial and normal models with the grid approximation. However,
+the poor scalability of the grid approximation makes it impractical to
+use on models of even moderate size. The standard solution is to Markov
+chain Monte Carlo methods that draw random samples from the posterior
+distribution. In this episode, we will practice working with
+samples.</p>
+<section id="example-binomial-model"><h2 class="section-heading">Example: binomial model<a class="anchor" aria-label="anchor" href="#example-binomial-model"></a>
 </h2>
-<hr class="half-width"><div id="keypoints1" class="callout keypoints">
+<hr class="half-width"><p>Let’s revisit the binomial model considered in the previous episode.
+The binomial model with a beta distribution is an example of a model
+where the analytical shape of the posterior is known.</p>
+<p><span class="math display">\[p(\theta | X) \sim Beta(\alpha + x,
+\beta + N - x),\]</span> where <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are the hyperparameters and <span class="math inline">\(x\)</span> the number of successes out of <span class="math inline">\(N\)</span> trials. Let’s generate samples from the
+prior and posterior distributions, using the handedness data of the
+previous episode.</p>
+<div class="codewrapper sourceCode" id="cb1">
+<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Sample size</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
+<span></span>
+<span><span class="co"># 7/50 are left-handed</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
+<span></span>
+<span><span class="co"># Number of samples</span></span>
+<span><span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fl">5000</span></span>
+<span></span>
+<span><span class="co"># Prior hyperparameters</span></span>
+<span><span class="va">alpha</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+<span></span>
+<span><span class="co"># Draw random values from the prior</span></span>
+<span><span class="va">prior_samples</span> <span class="op">&lt;-</span> <span class="fu">rbeta</span><span class="op">(</span>n <span class="op">=</span> <span class="va">n_samples</span>,</span>
+<span>                       shape1 <span class="op">=</span> <span class="va">alpha</span>,</span>
+<span>                       shape2 <span class="op">=</span> <span class="va">beta</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Draw random values from the posterior</span></span>
+<span><span class="va">posterior_samples</span> <span class="op">&lt;-</span> <span class="fu">rbeta</span><span class="op">(</span>n <span class="op">=</span> <span class="va">n_samples</span>,</span>
+<span>                           shape1 <span class="op">=</span> <span class="va">alpha</span> <span class="op">+</span> <span class="va">x</span>, </span>
+<span>                           shape2 <span class="op">=</span> <span class="va">beta</span> <span class="op">+</span> <span class="va">N</span> <span class="op">-</span> <span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bin_samples</span> <span class="op">&lt;-</span> <span class="fu">data.frame</span><span class="op">(</span>prior <span class="op">=</span> <span class="va">prior_samples</span>, </span>
+<span>                      posterior <span class="op">=</span> <span class="va">posterior_samples</span><span class="op">)</span></span></code></pre>
+</div>
+<p>Next, let’s plot histograms for these samples along with the
+analytical densities and the normalized likelihood (black).</p>
+<div class="codewrapper sourceCode" id="cb2">
+<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Wide --&gt; long format</span></span>
+<span><span class="va">bin_samples_w</span> <span class="op">&lt;-</span> <span class="va">bin_samples</span> <span class="op">%&gt;%</span> <span class="fu">gather</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"func"</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">bin_samples_w</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">..density..</span>,</span>
+<span>                     fill <span class="op">=</span> <span class="va">func</span><span class="op">)</span>,</span>
+<span>                 bins <span class="op">=</span> <span class="fl">50</span>, </span>
+<span>                 position <span class="op">=</span> <span class="st">"identity"</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Add analytical distributions</span></span>
+<span><span class="va">delta</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span>
+<span><span class="va">analytical_df</span> <span class="op">&lt;-</span> <span class="fu">data.frame</span><span class="op">(</span>p <span class="op">=</span> <span class="fu">seq</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, by <span class="op">=</span> <span class="va">delta</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>analytical_prior <span class="op">=</span> <span class="fu">dbeta</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span> , <span class="va">alpha</span>, <span class="va">beta</span><span class="op">)</span>, </span>
+<span>         analytical_posterior <span class="op">=</span> <span class="fu">dbeta</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span> , <span class="va">alpha</span> <span class="op">+</span> <span class="va">x</span>, <span class="va">beta</span> <span class="op">+</span> <span class="va">N</span> <span class="op">-</span> <span class="va">x</span><span class="op">)</span>, </span>
+<span>         likelihood <span class="op">=</span> <span class="fu">dbinom</span><span class="op">(</span>size <span class="op">=</span> <span class="va">N</span>, x <span class="op">=</span> <span class="va">x</span>, prob <span class="op">=</span> <span class="va">p</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>likelihood <span class="op">=</span> <span class="va">likelihood</span><span class="op">/</span><span class="op">(</span><span class="fu">sum</span><span class="op">(</span><span class="va">likelihood</span><span class="op">)</span><span class="op">*</span><span class="va">delta</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">gather</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"func"</span>, value <span class="op">=</span> <span class="st">"value"</span>, <span class="op">-</span><span class="va">p</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span>data <span class="op">=</span> <span class="va">analytical_df</span> <span class="op">%&gt;%</span> </span>
+<span>              <span class="fu">filter</span><span class="op">(</span><span class="va">func</span> <span class="op">!=</span> <span class="st">"likelihood"</span><span class="op">)</span>, </span>
+<span>            <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">func</span><span class="op">)</span>, </span>
+<span>            linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span>data <span class="op">=</span> <span class="va">analytical_df</span> <span class="op">%&gt;%</span> </span>
+<span>              <span class="fu">filter</span><span class="op">(</span><span class="va">func</span> <span class="op">==</span> <span class="st">"likelihood"</span><span class="op">)</span>, </span>
+<span>            <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span>, </span>
+<span>            linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">print</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">WARNING<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="warning" tabindex="0"><code>Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(density)` instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+</div>
+<figure><img src="../fig/sampling-rendered-unnamed-chunk-3-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><div class="codewrapper sourceCode" id="cb4">
+<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">CIs</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">MAP</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">p_true</span>, color <span class="op">=</span> <span class="st">"blue"</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Black = MAP and CIs"</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="error" tabindex="0"><code>Error in eval(expr, envir, enclos): object 'CIs' not found</code></pre>
+</div>
+<div class="Discussion">
+<p>Can you draw samples from the likelihood?</p>
+</div>
+<div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
 <i class="callout-icon" data-feather="key"></i>
 </div>
