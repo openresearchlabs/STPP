@@ -344,14 +344,138 @@ What happens if the true value of $\mu$ is not within the defined grid?
 :::::::::::::::::::::::::::::::::::::::::::::::
 
 
+::::::::::::::::::::::::::::::::::::: challenge
 
-## Conclusion
+Implement the grid approximation with both unkown mean $\mu$ and standard deviation $\sigma:$
+
+1. Generate data
+2. Define grid for $mu$ and $sigma$
+3. Compute prior, likelihood and posterior at grid points
+  - Use normal and gamma priors for $\mu$ and $\sigma$, respectively
+    - The prior is the product of priors of $\mu$ and $\sigma$
+4. Plot prior, likelihood and posterior (in 2D)
+5. Compute marginal prior, likelihood and posterior for $\mu$
+  - Marginalize (integrate) over sigma
+  - Normalize
+  - Plot
+
+:::::::::::::::::::::::: solution
+Included in the instructor's notes. 
+::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+::::::::::::::::::::::::::::::::::::: instructor
+
+``` {r, eval = FALSE}
+## Data *************************** ####
+
+# Sample size
+N <- 15
+
+
+# Generate data
+x <- rnorm(n = N, mean = 2.5, sd = 0.5) # mu = 2.5, sigma = 0.5
+
+
+# Define a grid of points for mu
+delta <- 0.01
+mu_grid <- seq(from = -5, to = 5, by = delta)
+sigma_grid <- seq(from = 0.01, to = 2, by = delta)
+
+
+
+## Fit model ********************** ####
+
+df <- expand.grid(mu = mu_grid, sigma = sigma_grid)
+
+# Log likelihood
+for(i in 1:nrow(df)) {
+  # print(i)
+  df[i, "log_likelihood"] <- sum(dnorm(x = x,
+                                   mean = df[i, "mu"], sd = df[i, "sigma"],
+                                   log = TRUE))
+}
+
+df <- df %>% 
+  mutate(likelihood = exp(log_likelihood))
+
+# Priors: mu ~ N(0, 5), sigma ~ Gamma(2, 1)
+df <- df %>% 
+  mutate(log_prior = dnorm(x = mu,
+                           mean = 0 ,
+                           sd = 1,
+                           log = TRUE) + dgamma(x = sigma, 
+                                                shape = 2,
+                                                scale = 1,
+                                                log = TRUE)) %>% 
+  mutate(prior = exp(log_prior))
+
+# Posterior
+df <- df %>% 
+  mutate(log_posterior = log_prior + log_likelihood) %>% 
+  mutate(posterior = exp(log_posterior)) %>% 
+  mutate(posterior = posterior/(sum(posterior)*delta^2)) # normalize
+
+
+
+
+# Plot
+p_posterior <- ggplot(df, 
+             aes(x = mu, y = sigma, fill = posterior)) + 
+  geom_tile() +
+  scale_fill_gradientn(colours = rainbow(5))
+
+p_likelihood <- ggplot(df, 
+                      aes(x = mu, y = sigma, fill = likelihood)) + 
+  geom_tile() +
+  scale_fill_gradientn(colours = rainbow(5))
+
+p_prior <- ggplot(df, 
+                       aes(x = mu, y = sigma, fill = prior)) + 
+  geom_tile() +
+  scale_fill_gradientn(colours = rainbow(5))
+
+
+p <- plot_grid(p_prior, p_likelihood, p_posterior)
+
+
+## Marginalize ******************** ####
+
+# long to wide format
+df_w <- df %>%
+  select(-c(log_likelihood, log_prior, log_posterior)) %>% 
+  gather(key = "func", value = "value", -c(mu, sigma))
+
+
+df_w_marginal <- df_w %>% 
+  group_by(mu, func) %>% 
+  summarise(marginal_distribution = sum(value)) %>% # integrate over sigma
+  ungroup %>% 
+  group_by(func) %>% # normalize marginal distributions
+  mutate(marginal_distribution = marginal_distribution/(sum(marginal_distribution)*delta))
+
+p_marginal <- df_w_marginal %>% 
+  ggplot(data = ., aes(x = mu, y = marginal_distribution, color = func)) + 
+  geom_line()
+  
+
+
+```
+:::::::::::::::::::::::::::::::::::::::::::::::
+
+
 
 ::::::::::::::::::::::::::::::::::::: keypoints 
 
 - Likelihood determines the probability of data conditional on the model parameters
 - Prior distribution encodes prior beliefs about the model parameters
 - Posterior distribution quantifies the probability of parameter values conditional on the data.
+- Posterior is a compromise between the data and prior. The less data available, the bigger the effect of the prior. 
+- The grid approximation is a means for accessing posterior distributions which may be difficult to compute analytically
+
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 

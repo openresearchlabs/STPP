@@ -6,23 +6,27 @@ exercises: 2
 
 :::::::::::::::::::::::::::::::::::::: questions 
 
-- How do you write a lesson using R Markdown and `{sandpaper}`?
+- How can I set R up for the course?
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::: objectives
 
-- Explain how to use markdown with the new lesson template
-- Demonstrate how to include pieces of code, figures, and nested challenge blocks
+- Install required packages
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
-```{r}
+```{r, message = FALSE}
+
+# Required packages
 library(tidyverse)
 library(magrittr)
+library(cowplot)
+library(rstan)
 
+# Set graphical theme
 theme_set(theme_bw(15))
 ```
 
@@ -30,10 +34,7 @@ theme_set(theme_bw(15))
 
 ::::::::::::::::::::::::::::::::::::: keypoints 
 
-- Use `.md` files for episodes when you want static content
-- Use `.Rmd` files for episodes when you need to generate output
-- Run `sandpaper::check_lesson()` to identify any issues with your lesson
-- Run `sandpaper::build_lesson()` to preview your lesson locally
+- point 1
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 
