@@ -201,7 +201,7 @@
 <div class="accordion accordion-flush" id="accordionFlush4">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-heading4">
-        <a href="sampling.html">3. Sampling</a>
+        <a href="sampling.html">3. Working with samples</a>
     </div>
 <!--/div.accordion-header-->
         
@@ -349,37 +349,109 @@ conjugate prior</p>
 <p>Actual value from a study from 1975 with 7,688 children in US grades
 1-6 was 9.6%</p>
 <p>Hardyck, C. et al. (1976), Left-handedness and cognitive deficit <a href="https://en.wikipedia.org/wiki/Handedness" class="external-link uri">https://en.wikipedia.org/wiki/Handedness</a></p>
-<hr></section><section id="sampling"><h2 class="section-heading"><a href="sampling.html">Sampling</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section><section id="stan"><h2 class="section-heading"><a href="stan.html">Stan</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section><section id="mcmc"><h2 class="section-heading"><a href="mcmc.html">MCMC</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section><section id="hierarchical-models"><h2 class="section-heading"><a href="hierarchical-models.html">Hierarchical Models</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section><section id="model-checking"><h2 class="section-heading"><a href="model-checking.html">Model checking</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section><section id="advanced-topics"><h2 class="section-heading"><a href="advanced-topics.html">Advanced topics</a></h2>
-<hr class="half-width">
-<p>Inline instructor notes can help inform instructors of timing
-challenges associated with the lessons. They appear in the “Instructor
-View”</p>
-<hr></section></section>
+<hr>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Data *************************** ####</span></span>
+<span></span>
+<span><span class="co"># Sample size</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">15</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Generate data</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">rnorm</span><span class="op">(</span>n <span class="op">=</span> <span class="va">N</span>, mean <span class="op">=</span> <span class="fl">2.5</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="co"># mu = 2.5, sigma = 0.5</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Define a grid of points for mu</span></span>
+<span><span class="va">delta</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span>
+<span><span class="va">mu_grid</span> <span class="op">&lt;-</span> <span class="fu">seq</span><span class="op">(</span>from <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>, to <span class="op">=</span> <span class="fl">5</span>, by <span class="op">=</span> <span class="va">delta</span><span class="op">)</span></span>
+<span><span class="va">sigma_grid</span> <span class="op">&lt;-</span> <span class="fu">seq</span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0.01</span>, to <span class="op">=</span> <span class="fl">2</span>, by <span class="op">=</span> <span class="va">delta</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co">## Fit model ********************** ####</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">expand.grid</span><span class="op">(</span>mu <span class="op">=</span> <span class="va">mu_grid</span>, sigma <span class="op">=</span> <span class="va">sigma_grid</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Log likelihood</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu">nrow</span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># print(i)</span></span>
+<span>  <span class="va">df</span><span class="op">[</span><span class="va">i</span>, <span class="st">"log_likelihood"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">sum</span><span class="op">(</span><span class="fu">dnorm</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>,</span>
+<span>                                   mean <span class="op">=</span> <span class="va">df</span><span class="op">[</span><span class="va">i</span>, <span class="st">"mu"</span><span class="op">]</span>, sd <span class="op">=</span> <span class="va">df</span><span class="op">[</span><span class="va">i</span>, <span class="st">"sigma"</span><span class="op">]</span>,</span>
+<span>                                   log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>likelihood <span class="op">=</span> <span class="fu">exp</span><span class="op">(</span><span class="va">log_likelihood</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Priors: mu ~ N(0, 5), sigma ~ Gamma(2, 1)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>log_prior <span class="op">=</span> <span class="fu">dnorm</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>,</span>
+<span>                           mean <span class="op">=</span> <span class="fl">0</span> ,</span>
+<span>                           sd <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                           log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu">dgamma</span><span class="op">(</span>x <span class="op">=</span> <span class="va">sigma</span>, </span>
+<span>                                                shape <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                                                scale <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                                                log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prior <span class="op">=</span> <span class="fu">exp</span><span class="op">(</span><span class="va">log_prior</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Posterior</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>log_posterior <span class="op">=</span> <span class="va">log_prior</span> <span class="op">+</span> <span class="va">log_likelihood</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>posterior <span class="op">=</span> <span class="fu">exp</span><span class="op">(</span><span class="va">log_posterior</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>posterior <span class="op">=</span> <span class="va">posterior</span><span class="op">/</span><span class="op">(</span><span class="fu">sum</span><span class="op">(</span><span class="va">posterior</span><span class="op">)</span><span class="op">*</span><span class="va">delta</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># normalize</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Plot</span></span>
+<span><span class="va">p_posterior</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">df</span>, </span>
+<span>             <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>, y <span class="op">=</span> <span class="va">sigma</span>, fill <span class="op">=</span> <span class="va">posterior</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_tile</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>colours <span class="op">=</span> <span class="fu">rainbow</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_likelihood</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">df</span>, </span>
+<span>                      <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>, y <span class="op">=</span> <span class="va">sigma</span>, fill <span class="op">=</span> <span class="va">likelihood</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_tile</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>colours <span class="op">=</span> <span class="fu">rainbow</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_prior</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">df</span>, </span>
+<span>                       <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>, y <span class="op">=</span> <span class="va">sigma</span>, fill <span class="op">=</span> <span class="va">prior</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_tile</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>colours <span class="op">=</span> <span class="fu">rainbow</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plot_grid</span><span class="op">(</span><span class="va">p_prior</span>, <span class="va">p_likelihood</span>, <span class="va">p_posterior</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="co">## Marginalize ******************** ####</span></span>
+<span></span>
+<span><span class="co"># long to wide format</span></span>
+<span><span class="va">df_w</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu">c</span><span class="op">(</span><span class="va">log_likelihood</span>, <span class="va">log_prior</span>, <span class="va">log_posterior</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">gather</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"func"</span>, value <span class="op">=</span> <span class="st">"value"</span>, <span class="op">-</span><span class="fu">c</span><span class="op">(</span><span class="va">mu</span>, <span class="va">sigma</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">df_w_marginal</span> <span class="op">&lt;-</span> <span class="va">df_w</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">mu</span>, <span class="va">func</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">summarise</span><span class="op">(</span>marginal_distribution <span class="op">=</span> <span class="fu">sum</span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co"># integrate over sigma</span></span>
+<span>  <span class="va">ungroup</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">func</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co"># normalize marginal distributions</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>marginal_distribution <span class="op">=</span> <span class="va">marginal_distribution</span><span class="op">/</span><span class="op">(</span><span class="fu">sum</span><span class="op">(</span><span class="va">marginal_distribution</span><span class="op">)</span><span class="op">*</span><span class="va">delta</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p_marginal</span> <span class="op">&lt;-</span> <span class="va">df_w_marginal</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">.</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>, y <span class="op">=</span> <span class="va">marginal_distribution</span>, color <span class="op">=</span> <span class="va">func</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span></span></code></pre>
+</div>
+<hr></section><section id="sampling"><h2 class="section-heading"><a href="sampling.html">Working with samples</a></h2>
+<hr class="half-width"></section><section id="stan"><h2 class="section-heading"><a href="stan.html">Stan</a></h2>
+<hr class="half-width"></section><section id="mcmc"><h2 class="section-heading"><a href="mcmc.html">MCMC</a></h2>
+<hr class="half-width"></section><section id="hierarchical-models"><h2 class="section-heading"><a href="hierarchical-models.html">Hierarchical Models</a></h2>
+<hr class="half-width"></section><section id="model-checking"><h2 class="section-heading"><a href="model-checking.html">Model checking</a></h2>
+<hr class="half-width"></section><section id="advanced-topics"><h2 class="section-heading"><a href="advanced-topics.html">Advanced topics</a></h2>
+<hr class="half-width"></section></section>
 </div>
     </main>
 </div>
@@ -427,7 +499,7 @@ View”</p>
   "creativeWorkStatus": "active",
   "url": "https://carpentries.github.io/workbench-template-rmd/instructor/instructor-notes.html",
   "identifier": "https://carpentries.github.io/workbench-template-rmd/instructor/instructor-notes.html",
-  "dateCreated": "2023-05-15",
+  "dateCreated": "2023-05-16",
   "dateModified": "2023-05-16",
   "datePublished": "2023-05-16"
 }
