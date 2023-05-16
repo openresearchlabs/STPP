@@ -4,6 +4,15 @@ teaching: 10
 exercises: 2
 ---
 
+
+```{r, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(cowplot)
+theme_set(theme_bw(15))
+```
+
+
 :::::::::::::::::::::::::::::::::::::: questions 
 
 - How do you work with posterior samples?
@@ -14,14 +23,109 @@ exercises: 2
 ::::::::::::::::::::::::::::::::::::: objectives
 
 - Learn how to
-  - 
   - work with posterior samples
   - compute posterior intervals
 
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 
-## Body
+In the last episode, we were introduced to the Bayesian formula and fit the binomial and normal models with the grid approximation. However, the poor scalability of the grid approximation makes it impractical to use on models of even moderate size. The standard solution is to Markov chain Monte Carlo methods that draw random samples from the posterior distribution. In this episode, we will practice working with samples. 
+
+## Example: binomial model
+
+Let's revisit the binomial model considered in the previous episode. The binomial model with a beta distribution is an example of a model where the analytical shape of the posterior is known. 
+
+$$p(\theta | X) \sim Beta(\alpha + x, \beta + N - x),$$
+where $\alpha$ and $\beta$ are the hyperparameters and $x$ the number of successes out of $N$ trials. Let's generate samples from the prior and posterior distributions, using the handedness data of the previous episode. 
+
+
+```{r}
+# Sample size
+N <- 50
+
+# 7/50 are left-handed
+x <- 7
+
+# Number of samples
+n_samples <- 5000
+
+# Prior hyperparameters
+alpha <- 1
+beta <- 10
+
+# Draw random values from the prior
+prior_samples <- rbeta(n = n_samples,
+                       shape1 = alpha,
+                       shape2 = beta)
+
+# Draw random values from the posterior
+posterior_samples <- rbeta(n = n_samples,
+                           shape1 = alpha + x, 
+                           shape2 = beta + N - x)
+
+bin_samples <- data.frame(prior = prior_samples, 
+                      posterior = posterior_samples)
+
+
+```
+
+
+Next, let's plot histograms for these samples along with the analytical densities and the normalized likelihood (black). 
+
+```{r}
+# Wide --> long format
+bin_samples_w <- bin_samples %>% gather(key = "func")
+
+
+p <- ggplot(bin_samples_w) + 
+  geom_histogram(aes(x = value, y = ..density..,
+                     fill = func),
+                 bins = 50, 
+                 position = "identity", alpha = 0.75)
+
+# Add analytical distributions
+delta <- 0.01
+analytical_df <- data.frame(p = seq(0, 1, by = delta)) %>% 
+  mutate(analytical_prior = dbeta(x = p , alpha, beta), 
+         analytical_posterior = dbeta(x = p , alpha + x, beta + N - x), 
+         likelihood = dbinom(size = N, x = x, prob = p)) %>% 
+  mutate(likelihood = likelihood/(sum(likelihood)*delta)) %>% 
+  gather(key = "func", value = "value", -p)
+
+
+p <- p + 
+  geom_line(data = analytical_df %>% 
+              filter(func != "likelihood"), 
+            aes(x = p, y = value, color = func), 
+            linewidth = 1) +
+  geom_line(data = analytical_df %>% 
+              filter(func == "likelihood"), 
+            aes(x = p, y = value), 
+            linewidth = 1)
+
+print(p)
+
+```
+
+
+
+```{r}
+
+  geom_vline(xintercept = CIs, linetype = "dashed") + 
+  geom_vline(xintercept = MAP) +
+  geom_vline(xintercept = p_true, color = "blue", size = 1) +
+  labs(title = "Black = MAP and CIs")
+```
+
+
+
+
+::::::::::::::::::::::::::::::::::::: Discussion
+
+Can you draw samples from the likelihood?
+
+:::::::::::::::::::::::::::::::::::::::::::::::
+
 
 
 ::::::::::::::::::::::::::::::::::::: keypoints 
