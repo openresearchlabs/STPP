@@ -24,14 +24,35 @@ exercises: 2
 
 ::::::::::::::::::::::::::::::::::::::::::::::::
 
-In the last episode, we were introduced to the Bayesian formula and fit the binomial and normal models with the grid approximation. However, the poor scalability of the grid approximation makes it impractical to use on models of even moderate size. The standard solution is to Markov chain Monte Carlo methods that draw random samples from the posterior distribution. In this episode, we will practice working with samples. 
+In the last episode, we were introduced to the Bayesian formula and fit the binomial and normal models with the grid approximation. However, the poor scalability of the grid approximation makes it impractical to use on models of even moderate size. The standard solution is to Markov chain Monte Carlo (MCMC) methods that draw random samples from the posterior distribution. Later, we will learn about MCMC methods but now we'll learn working with samples. 
 
 ## Example: binomial model
 
 Let's revisit the binomial model considered in the previous episode. The binomial model with a beta distribution is an example of a model where the analytical shape of the posterior is known. 
 
-$$p(\theta | X) \sim Beta(\alpha + x, \beta + N - x),$$
-where $\alpha$ and $\beta$ are the hyperparameters and $x$ the number of successes out of $N$ trials. Let's generate samples from the prior and posterior distributions, using the handedness data of the previous episode. 
+$$p(\theta | X) = Beta(\alpha + x, \beta + N - x),$$
+where $\alpha$ and $\beta$ are the hyperparameters and $x$ the number of successes out of $N$ trials. 
+
+::::::::::::::::::::::::::::::::::::::::: challenge
+
+Derive the analytical posterior distribution for the Beta-Binomial model. 
+
+
+::::::::::::::::::::::::::::::: solution
+
+
+\begin{align}
+p(\theta | X) &\propto  p(X | \theta) p(\theta) \\
+              &= ... 
+\end{align}
+
+
+::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+Let's generate samples from the prior and posterior distributions, using the handedness data of the previous episode. 
 
 
 
@@ -41,9 +62,6 @@ N <- 50
 
 # 7/50 are left-handed
 x <- 7
-
-# Frequency in a large population sample
-p_true <- 9.6/100
 
 # Number of samples
 n_samples <- 5000
@@ -67,7 +85,7 @@ bin_samples <- data.frame(prior = prior_samples,
 ```
 
 
-Next, let's plot histograms for these samples along with the analytical densities and the normalized likelihood (black). 
+Next, let's plot histograms for these samples along with the analytical densities, the normalized likelihood, and the "true" value (blue) based on a larger population sample. 
 
 
 ```r
@@ -76,7 +94,7 @@ bin_samples_w <- bin_samples %>% gather(key = "func")
 
 
 p <- ggplot(bin_samples_w) + 
-  geom_histogram(aes(x = value, y = ..density..,
+  geom_histogram(aes(x = value, y = after_stat(density),
                      fill = func),
                  bins = 50, 
                  position = "identity", alpha = 0.75)
@@ -91,27 +109,20 @@ analytical_df <- data.frame(p = seq(0, 1, by = delta)) %>%
   gather(key = "func", value = "value", -p)
 
 
+# Frequency in a large population sample (Hardyck, C. et al., 1976)
+p_true <- 9.6/100
+
 p <- p + 
-  geom_line(data = analytical_df %>% 
-              filter(func != "likelihood"), 
+  geom_line(data = analytical_df, 
             aes(x = p, y = value, color = func), 
             linewidth = 1) +
-  geom_line(data = analytical_df %>% 
-              filter(func == "likelihood"), 
-            aes(x = p, y = value), 
-            linewidth = 1) +
   geom_vline(xintercept = p_true,
-             color = "green", linewidth = 1)
+             color = "blue", 
+             linewidth = 1) +
+  scale_color_grafify() + 
+  scale_fill_grafify()
 
 print(p)
-```
-
-```{.warning}
-Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
-ℹ Please use `after_stat(density)` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-generated.
 ```
 
 <img src="fig/sampling-rendered-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
@@ -165,11 +176,14 @@ p_between_0.05_0.1 <- mean(posterior_samples > 0.05 & posterior_samples < 0.1)
 p_outside_0.05_0.1 <- mean(posterior_samples < 0.05 | posterior_samples > 0.10)
 ```
 
+Let's visualize these probabilities as proportions of the analytical posterior:
 
 
 
 
-::::::::::::::::::::::::::::::::::::: Discussion
+
+
+::::::::::::::::::::::::::::::::::::: discussion
 
 How would you compute CIs based on an analytical posterior density?
 
