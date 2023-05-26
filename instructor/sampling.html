@@ -275,7 +275,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Working with samples</h1>
-        <p> Last updated on 2023-05-16 | 
+        <p> Last updated on 2023-05-26 | 
         
         <a href="https://github.com/carpentries/workbench-template-rmd/edit/main/episodes/sampling.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
         
@@ -318,18 +318,51 @@
 fit the binomial and normal models with the grid approximation. However,
 the poor scalability of the grid approximation makes it impractical to
 use on models of even moderate size. The standard solution is to Markov
-chain Monte Carlo methods that draw random samples from the posterior
-distribution. In this episode, we will practice working with
-samples.</p>
+chain Monte Carlo (MCMC) methods that draw random samples from the
+posterior distribution. Later, we will learn about MCMC methods but now
+we’ll learn working with samples.</p>
 <section id="example-binomial-model"><h2 class="section-heading">Example: binomial model<a class="anchor" aria-label="anchor" href="#example-binomial-model"></a>
 </h2>
 <hr class="half-width"><p>Let’s revisit the binomial model considered in the previous episode.
 The binomial model with a beta distribution is an example of a model
 where the analytical shape of the posterior is known.</p>
-<p><span class="math display">\[p(\theta | X) \sim Beta(\alpha + x,
-\beta + N - x),\]</span> where <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are the hyperparameters and <span class="math inline">\(x\)</span> the number of successes out of <span class="math inline">\(N\)</span> trials. Let’s generate samples from the
-prior and posterior distributions, using the handedness data of the
-previous episode.</p>
+<p><span class="math display">\[p(\theta | X) = Beta(\alpha + x, \beta +
+N - x),\]</span> where <span class="math inline">\(\alpha\)</span> and
+<span class="math inline">\(\beta\)</span> are the hyperparameters and
+<span class="math inline">\(x\)</span> the number of successes out of
+<span class="math inline">\(N\)</span> trials.</p>
+<div id="challenge1" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<div class="callout-inner">
+<h3 class="callout-title">Challenge<a class="anchor" aria-label="anchor" href="#challenge1"></a>
+</h3>
+<div class="callout-content">
+<p>Derive the analytical posterior distribution for the Beta-Binomial
+model.</p>
+</div>
+</div>
+</div>
+<div id="accordionSolution1" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
+  <h4 class="accordion-header" id="headingSolution1">
+  Show me the solution
+  </h4>
+</button>
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div class="accordion-body">
+<p><span class="math display">\[\begin{align}
+p(\theta | X) &amp;\propto  p(X | \theta) p(\theta) \\
+              &amp;= ...
+\end{align}\]</span></p>
+</div>
+</div>
+</div>
+</div>
+<p>Let’s generate samples from the prior and posterior distributions,
+using the handedness data of the previous episode.</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -339,9 +372,6 @@ previous episode.</p>
 <span></span>
 <span><span class="co"># 7/50 are left-handed</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
-<span></span>
-<span><span class="co"># Frequency in a large population sample</span></span>
-<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">9.6</span><span class="op">/</span><span class="fl">100</span></span>
 <span></span>
 <span><span class="co"># Number of samples</span></span>
 <span><span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fl">5000</span></span>
@@ -364,7 +394,8 @@ previous episode.</p>
 <span>                      posterior <span class="op">=</span> <span class="va">posterior_samples</span><span class="op">)</span></span></code></pre>
 </div>
 <p>Next, let’s plot histograms for these samples along with the
-analytical densities and the normalized likelihood (black).</p>
+analytical densities, the normalized likelihood, and the “true” value
+(blue) based on a larger population sample.</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -374,7 +405,7 @@ analytical densities and the normalized likelihood (black).</p>
 <span></span>
 <span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">bin_samples_w</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="va">..density..</span>,</span>
+<span>  <span class="fu">geom_histogram</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">value</span>, y <span class="op">=</span> <span class="fu">after_stat</span><span class="op">(</span><span class="va">density</span><span class="op">)</span>,</span>
 <span>                     fill <span class="op">=</span> <span class="va">func</span><span class="op">)</span>,</span>
 <span>                 bins <span class="op">=</span> <span class="fl">50</span>, </span>
 <span>                 position <span class="op">=</span> <span class="st">"identity"</span>, alpha <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span>
@@ -389,28 +420,20 @@ analytical densities and the normalized likelihood (black).</p>
 <span>  <span class="fu">gather</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"func"</span>, value <span class="op">=</span> <span class="st">"value"</span>, <span class="op">-</span><span class="va">p</span><span class="op">)</span></span>
 <span></span>
 <span></span>
+<span><span class="co"># Frequency in a large population sample (Hardyck, C. et al., 1976)</span></span>
+<span><span class="va">p_true</span> <span class="op">&lt;-</span> <span class="fl">9.6</span><span class="op">/</span><span class="fl">100</span></span>
+<span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span>data <span class="op">=</span> <span class="va">analytical_df</span> <span class="op">%&gt;%</span> </span>
-<span>              <span class="fu">filter</span><span class="op">(</span><span class="va">func</span> <span class="op">!=</span> <span class="st">"likelihood"</span><span class="op">)</span>, </span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span>data <span class="op">=</span> <span class="va">analytical_df</span>, </span>
 <span>            <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">func</span><span class="op">)</span>, </span>
 <span>            linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span>data <span class="op">=</span> <span class="va">analytical_df</span> <span class="op">%&gt;%</span> </span>
-<span>              <span class="fu">filter</span><span class="op">(</span><span class="va">func</span> <span class="op">==</span> <span class="st">"likelihood"</span><span class="op">)</span>, </span>
-<span>            <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span>, </span>
-<span>            linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">p_true</span>,</span>
-<span>             color <span class="op">=</span> <span class="st">"green"</span>, linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>             color <span class="op">=</span> <span class="st">"blue"</span>, </span>
+<span>             linewidth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_grafify</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">scale_fill_grafify</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">print</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre>
-</div>
-<div class="codewrapper">
-<h3 class="code-label">WARNING<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="warning" tabindex="0"><code>Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
-ℹ Please use `after_stat(density)` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-generated.</code></pre>
 </div>
 <figure><img src="../fig/sampling-rendered-unnamed-chunk-3-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>In Episode 1, we summarized the posterior with points estimates,
 namely the posterior mode (MAP), mean and variance.</p>
@@ -425,7 +448,7 @@ which are also called highest posterior density intervals (HPDI).</p>
 example, along with the posterior mode (MAP), and include them in the
 figure.</p>
 <p>(Figure too busy –&gt; clarify)</p>
-<div class="codewrapper sourceCode" id="cb4">
+<div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -451,7 +474,7 @@ This warning is displayed once every 8 hours.
 Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 generated.</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb6">
+<div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -464,7 +487,7 @@ For instance, we might be interested in knowing the probability that the
 target parameter is less than 0.2, between 0.05 and 0.10, or less than
 0.05 or greater than 0.10. Such probabilities can be recovered based on
 samples simply by computing the proportion of samples in these sets.</p>
-<div class="codewrapper sourceCode" id="cb7">
+<div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -472,10 +495,21 @@ samples simply by computing the proportion of samples in these sets.</p>
 <span><span class="va">p_between_0.05_0.1</span> <span class="op">&lt;-</span> <span class="fu">mean</span><span class="op">(</span><span class="va">posterior_samples</span> <span class="op">&gt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">posterior_samples</span> <span class="op">&lt;</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">p_outside_0.05_0.1</span> <span class="op">&lt;-</span> <span class="fu">mean</span><span class="op">(</span><span class="va">posterior_samples</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">|</span> <span class="va">posterior_samples</span> <span class="op">&gt;</span> <span class="fl">0.10</span><span class="op">)</span></span></code></pre>
 </div>
-<div class="Discussion">
+<p>Let’s visualize these probabilities as proportions of the analytical
+posterior:</p>
+<div id="discussion1" class="callout discussion">
+<div class="callout-square">
+<i class="callout-icon" data-feather="message-circle"></i>
+</div>
+<div class="callout-inner">
+<h3 class="callout-title">Discussion<a class="anchor" aria-label="anchor" href="#discussion1"></a>
+</h3>
+<div class="callout-content">
 <p>How would you compute CIs based on an analytical posterior
 density?</p>
 <p>Can you draw samples from the likelihood?</p>
+</div>
+</div>
 </div>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
@@ -523,9 +557,9 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="../LICENSE.html">CC-BY 4.0</a> by the authors</p>
         
         <p><a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">Template licensed under CC-BY 4.0</a> by <a href="https://carpentries.org" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/0.11.16" class="external-link">sandpaper (0.11.16)</a>,
+        <p>Built with <a href="https://github.com/carpentries/sandpaper" class="external-link">sandpaper (0.12.1)</a>,
         <a href="https://github.com/carpentries/pegboard" class="external-link">pegboard (0.5.3)</a>,
-      and <a href="https://github.com/carpentries/varnish/tree/0.2.16" class="external-link">varnish (0.2.16)</a>.</p>
+      and <a href="https://github.com/carpentries/varnish/tree/0.2.17" class="external-link">varnish (0.2.17)</a>.</p>
 			</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -545,9 +579,9 @@ any links that you are not going to use.
   "creativeWorkStatus": "active",
   "url": "https://carpentries.github.io/workbench-template-rmd/instructor/sampling.html",
   "identifier": "https://carpentries.github.io/workbench-template-rmd/instructor/sampling.html",
-  "dateCreated": "2023-05-16",
-  "dateModified": "2023-05-16",
-  "datePublished": "2023-05-16"
+  "dateCreated": "2023-05-26",
+  "dateModified": "2023-05-26",
+  "datePublished": "2023-05-26"
 }
 
   </script><script>
