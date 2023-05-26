@@ -24,10 +24,13 @@ exercises: 2
 library(tidyverse)
 library(magrittr)
 library(cowplot)
+library(grafify)
 library(rstan)
 
 # Set graphical theme
 theme_set(theme_bw(15))
+
+# Set color scheme
 ```
 
 

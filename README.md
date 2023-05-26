@@ -8,3 +8,17 @@ and follow the instructions.
 If you have any questions, contact [@zkamvar](https://github.com/zkamvar)
 
 [workbench]: https://carpentries.github.io/sandpaper-docs/
+
+
+
+# Lesson pre-requisites
+
+In R, the learners should be comfortable with
+  
+  - manipulating data frames
+  - generating figures
+  - the pipe operator %>% 
+
+The material makes heavy use of the tidyverse packages, especially dplyr and ggplot2
+  
+  
