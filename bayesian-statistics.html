@@ -432,7 +432,8 @@ functions.</p>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">df_l</span>, </span>
 <span>       <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">p</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">func</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_grafify</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p1</span></span></code></pre>
 </div>
@@ -511,7 +512,8 @@ mentioned above.</p>
 <span>    <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">prior_type</span>,</span>
 <span>               scales <span class="op">=</span> <span class="st">"free"</span>, </span>
-<span>               ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>               ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_grafify</span><span class="op">(</span><span class="op">)</span></span>
 <span>    </span>
 <span><span class="va">p2</span>    </span></code></pre>
 </div>
@@ -664,7 +666,9 @@ vertical line).</p>
 <span>         <span class="fu">filter</span><span class="op">(</span><span class="op">!</span><span class="fu">grepl</span><span class="op">(</span><span class="st">"log"</span>, <span class="va">func</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>       <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mu</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">func</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">unknown_mu</span><span class="op">)</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">unknown_mu</span>, </span>
+<span>             color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_grafify</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p_reg</span></span></code></pre>
 </div>
