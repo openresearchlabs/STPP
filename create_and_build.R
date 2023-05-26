@@ -1,4 +1,8 @@
 
+library(sandpaper)
+library(varnish)
+library(pegboard)
+
 # Build lesson
 sandpaper::serve()
 
