@@ -3,6 +3,13 @@
 install.packages(c("sandpaper", "varnish", "pegboard", "tinkr"),
                  repos = c("https://carpentries.r-universe.dev/", getOption("repos")))
 
+library(sandpaper)
+library(varnish)
+library(pegboard)
+library(tinkr)
+
+
+
 # Build lesson
 sandpaper::serve()
 
