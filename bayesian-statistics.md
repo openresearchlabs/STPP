@@ -120,7 +120,8 @@ df_l <- df %>%
 p1 <- ggplot(df_l, 
        aes(x = p, y = value, color = func)) + 
   geom_point() +
-  geom_line()
+  geom_line() +
+  scale_color_grafify()
 
 p1
 ```
@@ -209,7 +210,8 @@ p2 <-ggplot(df2_w,
     geom_line() +
     facet_wrap(~prior_type,
                scales = "free", 
-               ncol = 1)
+               ncol = 1) +
+  scale_color_grafify()
     
 p2    
 ```
@@ -329,7 +331,9 @@ p_reg <- ggplot(df_l %>%
          filter(!grepl("log", func)), 
        aes(x = mu, y = value, color = func)) +
   geom_line() +
-  geom_vline(xintercept = unknown_mu)
+  geom_vline(xintercept = unknown_mu, 
+             color = "blue") +
+  scale_color_grafify()
 
 p_reg
 ```

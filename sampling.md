@@ -100,7 +100,7 @@ p <- ggplot(bin_samples_w) +
                  position = "identity", alpha = 0.75)
 
 # Add analytical distributions
-delta <- 0.01
+delta <- 0.001
 analytical_df <- data.frame(p = seq(0, 1, by = delta)) %>% 
   mutate(analytical_prior = dbeta(x = p , alpha, beta), 
          analytical_posterior = dbeta(x = p , alpha + x, beta + N - x), 
@@ -167,18 +167,18 @@ print(p)
 <img src="fig/sampling-rendered-unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 
-Another perspective into processing posterior information is to find the amount the posterior mass in a given interval (or some more general set). This approach enables determining probabilities for hypotheses. For instance, we might be interested in knowing the probability that the target parameter is less than 0.2, between 0.05 and 0.10, or less than 0.05 or greater than 0.10. Such probabilities can be recovered based on samples simply by computing the proportion of samples in these sets. 
+Another perspective into processing posterior information is to find the amount the posterior mass in a given interval (or some more general set). This approach enables determining probabilities for hypotheses. For instance, we might be interested in knowing the probability that the target parameter is less than 0.2, between 0.05 and 0.10, or less than 0.1 or greater than 0.20. Such probabilities can be recovered based on samples simply by computing the proportion of samples in these sets. 
 
 
 ```r
-p_less_than_0.2 <- mean(posterior_samples < 0.2)
+p_less_than_0.15 <- mean(posterior_samples < 0.15)
 p_between_0.05_0.1 <- mean(posterior_samples > 0.05 & posterior_samples < 0.1)
-p_outside_0.05_0.1 <- mean(posterior_samples < 0.05 | posterior_samples > 0.10)
+p_outside_0.1_0.2 <- mean(posterior_samples < 0.1 | posterior_samples > 0.2)
 ```
 
 Let's visualize these probabilities as proportions of the analytical posterior:
 
-
+<img src="fig/sampling-rendered-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 
 
@@ -191,6 +191,75 @@ Can you draw samples from the likelihood?
 
 :::::::::::::::::::::::::::::::::::::::::::::::
 
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+Write a function that returns the highest posterior density interval. Compute the 95% HPDI for the posterior samples generated (bin_samples) and compare it to the 95% CIs.
+
+
+:::::::::::::::::::::: hint
+
+If you sort the samples in order, each set of $n$ consecutive samples contains $100 \cdot n/N \%$ of the posterior. 
+
+:::::::::::::::::::::::::::
+
+
+:::::::::::::::::::::::::::: solution
+
+Let's write the function for computing the HPDI
+
+
+```r
+get_HPDI <- function(samples, prob) {
+  
+  # Total samples
+  n_samples <- length(samples)
+  
+  # How many samples constitute prob of the total number?
+  prob_samples <- round(prob*n_samples)
+  
+  # Sort samples
+  samples_sort <- samples %>% sort
+  
+  
+  # Each samples_sort[i:(i + prob_samples - 1)] contains prob of the total distribution mass
+  # Find the shortest such interval 
+  min_i <- lapply(1:(n_samples - prob_samples), function(i) {
+    
+    samples_sort[i + prob_samples - 1] - samples_sort[i]
+    
+  }) %>% unlist %>% which.min()
+  
+  # Get correspongind values
+  hpdi <- samples_sort[c(min_i, min_i + prob_samples)]
+  
+  return(hpdi)
+}
+```
+
+Then we can compute the 95% HPDI and compare it to the corresponding CIs
+
+
+```r
+data.frame(HPDI = get_HPDI(bin_samples$posterior, 0.95), 
+           CI = quantile(posterior_samples, probs = c(0.025, 0.975))) %>% 
+  t %>% 
+  data.frame() %>% 
+  mutate(length = X97.5. - X2.5.)
+```
+
+```{.output}
+          X2.5.    X97.5.    length
+HPDI 0.05295465 0.2141210 0.1611663
+CI   0.06035385 0.2245705 0.1642167
+```
+
+Both intervals contain the same mass but the HPDI is (slightly) shorter. 
+
+:::::::::::::::::::::::::::::::::::::
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::
 
 
 ::::::::::::::::::::::::::::::::::::: keypoints 
