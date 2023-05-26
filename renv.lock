@@ -2401,6 +2401,16 @@
       ],
       "Hash": "f1cb46c157d080b729159d407be83496"
     },
+    "varnish": {
+      "Package": "varnish",
+      "Version": "0.2.17",
+      "Source": "Repository",
+      "Repository": "https://carpentries.r-universe.dev",
+      "RemoteUrl": "https://github.com/carpentries/varnish",
+      "RemoteRef": "0.2.17",
+      "RemoteSha": "05491120472f179fc93fb3acb3ac2bb331c190a8",
+      "Hash": "1cde64e990c9c4d973e73682f8d6ab03"
+    },
     "vctrs": {
       "Package": "vctrs",
       "Version": "0.6.1",
