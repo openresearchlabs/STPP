@@ -1,7 +1,7 @@
 
-library(sandpaper)
-library(varnish)
-library(pegboard)
+# Install packages required for running carpentry
+install.packages(c("sandpaper", "varnish", "pegboard", "tinkr"),
+                 repos = c("https://carpentries.r-universe.dev/", getOption("repos")))
 
 # Build lesson
 sandpaper::serve()
