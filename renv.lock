@@ -2007,10 +2007,13 @@
     },
     "sandpaper": {
       "Package": "sandpaper",
-      "Version": "0.12.1",
+      "Version": "0.12.2",
       "Source": "Repository",
-      "Repository": "carpentries",
+      "Repository": "https://carpentries.r-universe.dev",
       "Remotes": "ropensci/tinkr, carpentries/pegboard, carpentries/varnish",
+      "RemoteUrl": "https://github.com/carpentries/sandpaper",
+      "RemoteRef": "0.12.2",
+      "RemoteSha": "e049976fa2dae573b2dd1766f2c56a49959be163",
       "Requirements": [
         "assertthat",
         "callr",
@@ -2036,7 +2039,7 @@
         "whisker",
         "yaml"
       ],
-      "Hash": "14d5e46c1e4f36944c43bb0d831e2fa8"
+      "Hash": "a9824bb57ce18cf8fddd509f8e13654b"
     },
     "sass": {
       "Package": "sass",
